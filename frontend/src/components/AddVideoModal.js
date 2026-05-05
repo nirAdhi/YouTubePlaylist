@@ -3,20 +3,40 @@
 import { useState } from 'react';
 import { addVideo } from '@/lib/api';
 
+const categoryLabels = {
+  Relaxing: 'Relaxing',
+  Motivational: 'Motivational',
+  Funny: 'Funny',
+  Music: 'Music',
+  Learning: 'Learning',
+  Tech: 'Tech',
+  Gaming: 'Gaming',
+  Fitness: 'Fitness',
+  Cooking: 'Cooking',
+  News: 'News',
+  Productivity: 'Productivity',
+  Creative: 'Creative',
+  Entertainment: 'Entertainment',
+  Other: 'Other',
+};
+
 export default function AddVideoModal({ onClose, onAdded }) {
   const [url, setUrl] = useState('');
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [detectedCategory, setDetectedCategory] = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setDetectedCategory('');
     try {
-      await addVideo(url, note);
-      onAdded();
-      onClose();
+      const video = await addVideo(url, note);
+      setDetectedCategory(video.category || 'Other');
+      onAdded(video);
+      setTimeout(() => onClose(), 1200);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to add video');
     } finally {
@@ -50,6 +70,14 @@ export default function AddVideoModal({ onClose, onAdded }) {
               className="w-full px-4 py-2 bg-gray-950 border border-gray-750 rounded-lg focus:outline-none focus:border-blue-500"
             />
           </div>
+          {detectedCategory && (
+            <div className="flex items-center gap-2 text-sm text-gray-300">
+              <span>Detected mood:</span>
+              <span className="px-2 py-0.5 bg-gray-750 rounded-full text-xs font-medium">
+                {categoryLabels[detectedCategory] || detectedCategory}
+              </span>
+            </div>
+          )}
           <div className="flex gap-3 pt-2">
             <button
               type="button"

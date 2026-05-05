@@ -8,7 +8,40 @@ import PlaylistSidebar from '@/components/PlaylistSidebar';
 import ReminderModal from '@/components/ReminderModal';
 import { fetchVideos, fetchPlaylists } from '@/lib/api';
 
-const categories = ['All', 'Study', 'Tech', 'Creative', 'Entertainment', 'Other'];
+const categories = [
+  'All',
+  'Relaxing',
+  'Motivational',
+  'Funny',
+  'Music',
+  'Learning',
+  'Tech',
+  'Gaming',
+  'Fitness',
+  'Cooking',
+  'News',
+  'Productivity',
+  'Creative',
+  'Entertainment',
+  'Other',
+];
+
+const categoryColors = {
+  Relaxing: 'bg-teal-600',
+  Motivational: 'bg-orange-600',
+  Funny: 'bg-yellow-600',
+  Music: 'bg-pink-600',
+  Learning: 'bg-blue-600',
+  Tech: 'bg-cyan-600',
+  Gaming: 'bg-purple-600',
+  Fitness: 'bg-green-600',
+  Cooking: 'bg-red-600',
+  News: 'bg-slate-600',
+  Productivity: 'bg-indigo-600',
+  Creative: 'bg-rose-600',
+  Entertainment: 'bg-violet-600',
+  Other: 'bg-gray-600',
+};
 
 export default function Dashboard() {
   const router = useRouter();
@@ -164,7 +197,17 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {showAddModal && <AddVideoModal onClose={() => setShowAddModal(false)} onAdded={loadData} />}
+      {showAddModal && (
+        <AddVideoModal
+          onClose={() => setShowAddModal(false)}
+          onAdded={(addedVideo) => {
+            loadData();
+            if (addedVideo?.category) {
+              setSelectedCategory(addedVideo.category);
+            }
+          }}
+        />
+      )}
       {reminderVideo && (
         <ReminderModal
           video={reminderVideo}

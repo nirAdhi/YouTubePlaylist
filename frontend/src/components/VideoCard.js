@@ -15,6 +15,23 @@ const statusLabels = {
   watched: 'Watched',
 };
 
+const categoryColors = {
+  Relaxing: 'bg-teal-600/20 text-teal-300',
+  Motivational: 'bg-orange-600/20 text-orange-300',
+  Funny: 'bg-yellow-600/20 text-yellow-300',
+  Music: 'bg-pink-600/20 text-pink-300',
+  Learning: 'bg-blue-600/20 text-blue-300',
+  Tech: 'bg-cyan-600/20 text-cyan-300',
+  Gaming: 'bg-purple-600/20 text-purple-300',
+  Fitness: 'bg-green-600/20 text-green-300',
+  Cooking: 'bg-red-600/20 text-red-300',
+  News: 'bg-slate-600/20 text-slate-300',
+  Productivity: 'bg-indigo-600/20 text-indigo-300',
+  Creative: 'bg-rose-600/20 text-rose-300',
+  Entertainment: 'bg-violet-600/20 text-violet-300',
+  Other: 'bg-gray-600/20 text-gray-300',
+};
+
 export default function VideoCard({ video, playlists, onUpdate, onDelete, onSetReminder }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [playlistOpen, setPlaylistOpen] = useState(false);
@@ -63,7 +80,7 @@ export default function VideoCard({ video, playlists, onUpdate, onDelete, onSetR
           <h3 className="font-medium text-sm line-clamp-2 leading-snug mb-1">{video.title}</h3>
           <p className="text-xs text-gray-400 mb-2">{video.channel}</p>
           <div className="flex items-center justify-between">
-            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600/20 text-blue-300">
+            <span className={`text-xs px-2 py-0.5 rounded-full ${categoryColors[video.category] || categoryColors.Other}`}>
               {video.category}
             </span>
             <span
