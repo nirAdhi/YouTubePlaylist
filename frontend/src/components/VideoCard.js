@@ -78,11 +78,13 @@ export default function VideoCard({ video, playlists, onUpdate, onDelete, onSetR
         </div>
         <div className="p-3">
           <h3 className="font-medium text-sm line-clamp-2 leading-snug mb-1">{video.title}</h3>
-          <p className="text-xs text-gray-400 mb-2">{video.channel}</p>
           <div className="flex items-center justify-between">
-            <span className={`text-xs px-2 py-0.5 rounded-full ${categoryColors[video.category] || categoryColors.Other}`}>
-              {video.category}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className={`text-xs px-2 py-0.5 rounded-full ${categoryColors[video.category] || categoryColors.Other}`}>
+                {video.category}
+              </span>
+              <span className="text-[10px] text-gray-500 uppercase tracking-wider">{video.channel}</span>
+            </div>
             <span
               className={`text-xs px-2 py-0.5 rounded-full text-white ${statusColors[video.watchStatus]}`}
             >

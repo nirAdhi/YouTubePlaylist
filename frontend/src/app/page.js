@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import VideoCard from '@/components/VideoCard';
 import AddVideoModal from '@/components/AddVideoModal';
 import PlaylistSidebar from '@/components/PlaylistSidebar';
@@ -45,6 +45,7 @@ const categoryColors = {
 
 export default function Dashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState(null);
   const [videos, setVideos] = useState([]);
   const [playlists, setPlaylists] = useState([]);
@@ -52,7 +53,20 @@ export default function Dashboard() {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [search, setSearch] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [prefilledUrl, setPrefilledUrl] = useState('');
   const [reminderVideo, setReminderVideo] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Handle shared URLs from Android Share
+  useEffect(() => {
+    const addUrl = searchParams.get('addUrl');
+    if (addUrl) {
+      setPrefilledUrl(addUrl);
+      setShowAddModal(true);
+      // Clean URL param
+      router.replace('/', { scroll: false });
+    }
+  }, [searchParams, router]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -101,68 +115,109 @@ export default function Dashboard() {
     router.push('/login');
   }
 
+  function handleSidebarSelect(id) {
+    setSelectedPlaylist(id);
+    setSidebarOpen(false);
+  }
+
+  function handleCloseAddModal() {
+    setShowAddModal(false);
+    setPrefilledUrl('');
+  }
+
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen">
-      <PlaylistSidebar
-        playlists={playlists}
-        selectedPlaylist={selectedPlaylist}
-        onSelect={setSelectedPlaylist}
-        onUpdate={loadData}
-      />
+    <div className="flex min-h-screen relative">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-      <div className="flex-1">
-        <header className="sticky top-0 z-30 bg-gray-950/90 backdrop-blur border-b border-gray-750 px-6 py-3">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+      {/* Sidebar - hidden on mobile unless toggled */}
+      <div className={`
+        fixed lg:static inset-y-0 left-0 z-50
+        transform transition-transform duration-200 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        lg:translate-x-0
+      `}>
+        <PlaylistSidebar
+          playlists={playlists}
+          selectedPlaylist={selectedPlaylist}
+          onSelect={handleSidebarSelect}
+          onUpdate={loadData}
+          onCloseMobile={() => setSidebarOpen(false)}
+        />
+      </div>
+
+      <div className="flex-1 min-w-0">
+        {/* Mobile-optimized header */}
+        <header className="sticky top-0 z-30 bg-gray-950/90 backdrop-blur border-b border-gray-750 px-3 sm:px-6 py-2.5 sm:py-3">
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Hamburger menu for mobile */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-800 active:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label="Open menu"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </div>
-              <h1 className="font-bold text-lg hidden sm:block">VidVault</h1>
+              <h1 className="font-bold text-base sm:text-lg hidden sm:block">VidVault</h1>
             </div>
 
-            <div className="flex-1 max-w-xl">
+            <div className="flex-1 min-w-0">
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search videos..."
-                className="w-full px-4 py-2 bg-gray-850 border border-gray-750 rounded-full text-sm focus:outline-none focus:border-gray-600"
+                placeholder="Search..."
+                className="w-full px-3 sm:px-4 py-2 bg-gray-850 border border-gray-750 rounded-full text-sm focus:outline-none focus:border-gray-600"
               />
             </div>
 
+            {/* Add button - icon only on small screens */}
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-850 hover:bg-gray-750 rounded-full text-sm font-medium transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-gray-850 hover:bg-gray-750 rounded-full text-sm font-medium transition-colors active:bg-gray-700 min-h-[44px]"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add
+              <span className="hidden sm:inline">Add</span>
             </button>
 
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-400 hidden md:block">{user.email}</span>
-              <button
-                onClick={logout}
-                className="text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                Logout
-              </button>
-            </div>
+            <button
+              onClick={logout}
+              className="p-2 rounded-lg hover:bg-gray-800 active:bg-gray-700 text-sm text-gray-400 hover:text-white transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label="Logout"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
           </div>
         </header>
 
-        <div className="px-6 py-4">
-          <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
+        <div className="px-3 sm:px-6 py-3 sm:py-4">
+          {/* Category pills - horizontal scroll on all sizes */}
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-3 sm:mb-4 scrollbar-hide -mx-1 px-1">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
+                className={`px-3 sm:px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors flex-shrink-0 min-h-[36px] ${
                   selectedCategory === cat
                     ? 'bg-white text-gray-950 font-medium'
                     : 'bg-gray-850 hover:bg-gray-750'
@@ -174,14 +229,14 @@ export default function Dashboard() {
           </div>
 
           {filteredVideos.length === 0 ? (
-            <div className="text-center py-20">
+            <div className="text-center py-16 sm:py-20">
               <p className="text-gray-400 text-lg">No videos found</p>
               <p className="text-gray-500 text-sm mt-1">
                 Add your first video to get started
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               {filteredVideos.map((video) => (
                 <VideoCard
                   key={video.id}
@@ -199,7 +254,8 @@ export default function Dashboard() {
 
       {showAddModal && (
         <AddVideoModal
-          onClose={() => setShowAddModal(false)}
+          prefilledUrl={prefilledUrl}
+          onClose={handleCloseAddModal}
           onAdded={(addedVideo) => {
             loadData();
             if (addedVideo?.category) {

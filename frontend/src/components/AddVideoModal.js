@@ -20,8 +20,8 @@ const categoryLabels = {
   Other: 'Other',
 };
 
-export default function AddVideoModal({ onClose, onAdded }) {
-  const [url, setUrl] = useState('');
+export default function AddVideoModal({ onClose, onAdded, prefilledUrl = '' }) {
+  const [url, setUrl] = useState(prefilledUrl);
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -38,26 +38,30 @@ export default function AddVideoModal({ onClose, onAdded }) {
       onAdded(video);
       setTimeout(() => onClose(), 1200);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to add video');
+      if (err.response?.status === 409) {
+        setError('This video is already in your library');
+      } else {
+        setError(err.response?.data?.error || 'Failed to add video');
+      }
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="w-full max-w-md bg-gray-850 rounded-xl border border-gray-750 p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-md bg-gray-850 rounded-xl border border-gray-750 p-4 sm:p-6">
         <h2 className="text-xl font-bold mb-4">Add Video</h2>
         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">YouTube URL</label>
+            <label className="block text-sm text-gray-400 mb-1">Video URL</label>
             <input
               type="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://youtube.com/watch?v=..."
-              className="w-full px-4 py-2 bg-gray-950 border border-gray-750 rounded-lg focus:outline-none focus:border-blue-500"
+              placeholder="Paste any video link: YouTube, TikTok, Instagram, Facebook, Vimeo, Twitter..."
+              className="w-full px-4 py-2 bg-gray-950 border border-gray-750 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
               required
             />
           </div>

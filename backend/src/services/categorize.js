@@ -64,6 +64,7 @@ const KEYWORDS = {
       'sketch comedy','parody','satire','joke','reaction','fail','bloopers',
       'compilation','try not to laugh','roast','troll','awkward','cringe',
       'vine','tiktok','shorts funny','comic','humor','comedian','impression',
+      'trending','viral','dance challenge','transition','filter','filter challenge',
     ],
   },
   Motivational: {

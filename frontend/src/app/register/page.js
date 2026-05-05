@@ -24,9 +24,16 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950">
-      <div className="w-full max-w-md p-8 bg-gray-850 rounded-xl border border-gray-750">
-        <h1 className="text-2xl font-bold mb-6 text-center">Create Account</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 p-4">
+      <div className="w-full max-w-md p-6 sm:p-8 bg-gray-850 rounded-xl border border-gray-750">
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
+            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold">Create Account</h1>
+        </div>
         {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -35,8 +42,9 @@ export default function RegisterPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 bg-gray-950 border border-gray-750 rounded-lg focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 bg-gray-950 border border-gray-750 rounded-lg focus:outline-none focus:border-blue-500 text-base min-h-[48px]"
               required
+              autoComplete="email"
             />
           </div>
           <div>
@@ -45,13 +53,14 @@ export default function RegisterPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 bg-gray-950 border border-gray-750 rounded-lg focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 bg-gray-950 border border-gray-750 rounded-lg focus:outline-none focus:border-blue-500 text-base min-h-[48px]"
               required
+              autoComplete="new-password"
             />
           </div>
           <button
             type="submit"
-            className="w-full py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors"
+            className="w-full py-3 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors text-base min-h-[48px]"
           >
             Register
           </button>

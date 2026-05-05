@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createPlaylist, deletePlaylist } from '@/lib/api';
 
-export default function PlaylistSidebar({ playlists, selectedPlaylist, onSelect, onUpdate }) {
+export default function PlaylistSidebar({ playlists, selectedPlaylist, onSelect, onUpdate, onCloseMobile }) {
   const [newName, setNewName] = useState('');
   const [showInput, setShowInput] = useState(false);
 
@@ -25,7 +25,19 @@ export default function PlaylistSidebar({ playlists, selectedPlaylist, onSelect,
   }
 
   return (
-    <div className="w-64 flex-shrink-0 border-r border-gray-750 bg-gray-850 min-h-screen p-4">
+    <div className="w-64 flex-shrink-0 border-r border-gray-750 bg-gray-850 min-h-screen p-4 relative">
+      {/* Mobile close button */}
+      {onCloseMobile && (
+        <button
+          onClick={onCloseMobile}
+          className="lg:hidden absolute top-4 right-4 p-1 rounded-lg hover:bg-gray-750 active:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+          aria-label="Close menu"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      )}
       <h2 className="font-bold text-lg mb-4">Library</h2>
       <nav className="space-y-1">
         <button

@@ -1,7 +1,7 @@
 const express = require('express');
 const { prisma } = require('../lib/prisma');
 const { authMiddleware } = require('./auth');
-const { fetchYouTubeMetadata } = require('../services/youtube');
+const { fetchMetadata, normalizeUrl } = require('../services/metadata');
 const { categorizeVideo } = require('../services/categorize');
 
 const router = express.Router();
@@ -39,13 +39,31 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'URL is required' });
     }
 
-    const metadata = await fetchYouTubeMetadata(url);
+    const metadata = await fetchMetadata(url);
     const category = categorizeVideo(metadata.title, metadata.channel);
+
+    // Check for duplicates using normalized URL or videoId
+    const existing = await prisma.video.findFirst({
+      where: {
+        userId: req.user.userId,
+        OR: [
+          { url: metadata.normalizedUrl },
+          { url: { startsWith: metadata.normalizedUrl } },
+        ],
+      },
+    });
+
+    if (existing) {
+      return res.status(409).json({
+        error: 'Video already in your library',
+        video: existing,
+      });
+    }
 
     const video = await prisma.video.create({
       data: {
         userId: req.user.userId,
-        url,
+        url: metadata.normalizedUrl,
         title: metadata.title,
         thumbnail: metadata.thumbnail,
         channel: metadata.channel,
