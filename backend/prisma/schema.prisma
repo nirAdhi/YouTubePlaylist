@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String     @id @default(uuid())
+  email      String     @unique
+  password   String
+  createdAt  DateTime   @default(now()) @map("created_at")
+  videos     Video[]
+  playlists  Playlist[]
+  reminders  Reminder[]
+
+  @@map("users")
+}
+
+model Video {
+  id          String            @id @default(uuid())
+  userId      String            @map("user_id")
+  url         String
+  title       String
+  thumbnail   String
+  channel     String
+  duration    String
+  category    String            @default("Uncategorized")
+  note        String?
+  watchStatus String            @default("unwatched") @map("watch_status")
+  timestamp   Int?              // saved playback position in seconds
+  createdAt   DateTime          @default(now()) @map("created_at")
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playlists   PlaylistVideo[]
+  reminders   Reminder[]
+
+  @@map("videos")
+}
+
+model Playlist {
+  id        String          @id @default(uuid())
+  userId    String          @map("user_id")
+  name      String
+  createdAt DateTime        @default(now()) @map("created_at")
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videos    PlaylistVideo[]
+
+  @@map("playlists")
+}
+
+model PlaylistVideo {
+  id         String   @id @default(uuid())
+  playlistId String   @map("playlist_id")
+  videoId    String   @map("video_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  video      Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([playlistId, videoId])
+  @@map("playlist_videos")
+}
+
+model Reminder {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  videoId       String   @map("video_id")
+  scheduledTime DateTime @map("scheduled_time")
+  status        String   @default("pending")
+  createdAt     DateTime @default(now()) @map("created_at")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video         Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@map("reminders")
+}
