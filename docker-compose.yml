@@ -8,7 +8,7 @@ services:
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:5000
+      - NEXT_PUBLIC_API_URL=http://46.224.110.185:5000
 
   backend:
     build: ./backend
