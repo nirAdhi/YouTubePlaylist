@@ -3,7 +3,13 @@ import './globals.css';
 export const metadata = {
   title: 'VidVault',
   description: 'Your personal video library with smart mood categorization',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: '#0a0a0a',
 };
 

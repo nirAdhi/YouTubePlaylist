@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import VideoCard from '@/components/VideoCard';
 import AddVideoModal from '@/components/AddVideoModal';
@@ -43,7 +43,7 @@ const categoryColors = {
   Other: 'bg-gray-600',
 };
 
-export default function Dashboard() {
+function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [user, setUser] = useState(null);
@@ -272,5 +272,17 @@ export default function Dashboard() {
         />
       )}
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-400">
+        <div className="w-8 h-8 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    }>
+      <Dashboard />
+    </Suspense>
   );
 }
