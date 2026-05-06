@@ -15,6 +15,7 @@ model User {
   videos     Video[]
   playlists  Playlist[]
   reminders  Reminder[]
+  notes      Note[]
 
   @@map("users")
 }
@@ -73,4 +74,19 @@ model Reminder {
   video         Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
   @@map("reminders")
+}
+
+model Note {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  title       String
+  content     String   @db.Text
+  color       String   @default("gray")
+  category    String   @default("General")
+  isPinned    Boolean  @default(false) @map("is_pinned")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notes")
 }

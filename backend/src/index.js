@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const videoRoutes = require('./routes/videos');
 const playlistRoutes = require('./routes/playlists');
 const reminderRoutes = require('./routes/reminders');
+const noteRoutes = require('./routes/notes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -69,12 +70,13 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-app.use(express.json({ limit: '10kb' })); // Limit body size
+app.use(express.json({ limit: '100kb' })); // Limit body size (larger for notes)
 
 app.use('/api/auth', authRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/reminders', reminderRoutes);
+app.use('/api/notes', noteRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });

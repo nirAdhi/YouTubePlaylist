@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import VideoCard from '@/components/VideoCard';
 import AddVideoModal from '@/components/AddVideoModal';
+import BulkAddModal from '@/components/BulkAddModal';
 import PlaylistSidebar from '@/components/PlaylistSidebar';
 import ReminderModal from '@/components/ReminderModal';
 import { fetchVideos, fetchPlaylists } from '@/lib/api';
@@ -53,6 +54,7 @@ function Dashboard() {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [search, setSearch] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   const [prefilledUrl, setPrefilledUrl] = useState('');
   const [reminderVideo, setReminderVideo] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -187,17 +189,37 @@ function Dashboard() {
               />
             </div>
 
-            {/* Add button - icon only on small screens */}
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-gray-850 hover:bg-gray-750 rounded-full text-sm font-medium transition-colors active:bg-gray-700 min-h-[44px]"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              <span className="hidden sm:inline">Add</span>
-            </button>
+            {/* Add buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowBulkModal(true)}
+                className="flex items-center gap-1.5 px-3 py-2 bg-gray-850 hover:bg-gray-750 rounded-full text-sm font-medium transition-colors active:bg-gray-700 min-h-[44px]"
+                title="Add Multiple Videos"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <span className="hidden md:inline">Bulk Add</span>
+              </button>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-full text-sm font-medium transition-colors active:bg-blue-800 min-h-[44px]"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span className="hidden sm:inline">Add</span>
+              </button>
+            </div>
 
+            <button
+              onClick={() => router.push('/notes')}
+              className="p-2 rounded-lg hover:bg-gray-800 active:bg-gray-700 text-sm text-gray-400 hover:text-white transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label="Notes"
+              title="Notes"
+            >
+              <span className="text-xl">📝</span>
+            </button>
             <button
               onClick={logout}
               className="p-2 rounded-lg hover:bg-gray-800 active:bg-gray-700 text-sm text-gray-400 hover:text-white transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -261,6 +283,14 @@ function Dashboard() {
             if (addedVideo?.category) {
               setSelectedCategory(addedVideo.category);
             }
+          }}
+        />
+      )}
+      {showBulkModal && (
+        <BulkAddModal
+          onClose={() => setShowBulkModal(false)}
+          onBulkAdd={(addedVideos) => {
+            loadData();
           }}
         />
       )}

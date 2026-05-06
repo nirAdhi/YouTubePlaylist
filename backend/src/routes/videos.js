@@ -128,4 +128,76 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Bulk add multiple videos
+router.post('/bulk', async (req, res) => {
+  try {
+    const { urls } = req.body;
+    if (!urls || !Array.isArray(urls) || urls.length === 0) {
+      return res.status(400).json({ error: 'URLs array is required' });
+    }
+
+    const results = {
+      added: [],
+      duplicates: [],
+      failed: [],
+    };
+
+    // Process each URL
+    for (const url of urls) {
+      const trimmedUrl = url.trim();
+      if (!trimmedUrl) continue;
+
+      try {
+        const metadata = await fetchMetadata(trimmedUrl);
+        const category = categorizeVideo(metadata.title, metadata.channel);
+
+        // Check for duplicates
+        const existing = await prisma.video.findFirst({
+          where: {
+            userId: req.user.userId,
+            OR: [
+              { url: metadata.normalizedUrl },
+              { url: { startsWith: metadata.normalizedUrl } },
+            ],
+          },
+        });
+
+        if (existing) {
+          results.duplicates.push({
+            url: trimmedUrl,
+            title: metadata.title,
+            reason: 'Already in library',
+          });
+          continue;
+        }
+
+        const video = await prisma.video.create({
+          data: {
+            userId: req.user.userId,
+            url: metadata.normalizedUrl,
+            title: metadata.title,
+            thumbnail: metadata.thumbnail,
+            channel: metadata.channel,
+            duration: metadata.duration,
+            category,
+          },
+        });
+
+        results.added.push(video);
+      } catch (error) {
+        console.error(`Failed to add ${trimmedUrl}:`, error.message);
+        results.failed.push({
+          url: trimmedUrl,
+          reason: error.message || 'Failed to fetch metadata',
+        });
+      }
+    }
+
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to process bulk add' });
+  }
+});
+
 module.exports = router;
