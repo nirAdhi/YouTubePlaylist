@@ -9,14 +9,15 @@ RUN apt-get update -y && \
 
 WORKDIR /app
 
-# Copy and install dependencies
+# Copy and install dependencies (need devDeps for prisma generate)
 COPY package*.json ./
-RUN npm ci --only=production --legacy-peer-deps && \
-    npm cache clean --force
+RUN npm install --legacy-peer-deps
 
-# Copy application code
+# Copy application code and build
 COPY . .
 RUN npx prisma generate && \
+    npm prune --omit=dev && \
+    npm cache clean --force && \
     chmod +x startup.sh worker-startup.sh && \
     chown -R nodejs:nodejs /app
 
