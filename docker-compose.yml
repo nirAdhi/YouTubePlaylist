@@ -3,53 +3,119 @@ version: '3.9'
 services:
   frontend:
     build: ./frontend
+    # Only expose to local network - use Nginx Proxy Manager for public access
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
-      - NEXT_PUBLIC_API_URL=http://46.224.110.185:5000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    networks:
+      - vidvault-internal
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
 
   backend:
     build: ./backend
-    ports:
-      - "5000:5000"
+    # No external port - only accessible via internal network or nginx proxy
+    expose:
+      - "5000"
     environment:
-      - DATABASE_URL=postgresql://user:pass@db:5432/vidvault
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
       - PORT=5000
-      - JWT_SECRET=vidvault-secret-key-change-in-production
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - vidvault-internal
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/videos"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   worker:
     build: ./backend
     command: sh worker-startup.sh
     environment:
-      - DATABASE_URL=postgresql://user:pass@db:5432/vidvault
-      - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=vidvault-secret-key-change-in-production
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - vidvault-internal
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
 
   db:
-    image: postgres:15
-    restart: always
+    image: postgres:15-alpine
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: vidvault
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    # No external port - only accessible via internal network
+    expose:
+      - "5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - vidvault-internal
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
+    image: redis:7-alpine
+    restart: unless-stopped
+    # No external port - only accessible via internal network
+    expose:
+      - "6379"
+    command: >
+      sh -c "redis-server --appendonly yes --requirepass \"$${REDIS_PASSWORD}\""
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    volumes:
+      - redisdata:/data
+    networks:
+      - vidvault-internal
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  vidvault-internal:
+    driver: bridge
+    internal: false
 
 volumes:
   pgdata:
+  redisdata:

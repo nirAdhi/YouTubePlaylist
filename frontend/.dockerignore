@@ -2,3 +2,8 @@ node_modules
 npm-debug.log
 .DS_Store
 .next
+
+# Environment files - secrets come from docker-compose
+.env
+.env.local
+.env.production

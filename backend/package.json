@@ -12,9 +12,12 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "bcrypt": "^5.1.1",
     "bullmq": "^5.34.0",
     "cors": "^2.8.5",
     "express": "^4.21.0",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
     "ioredis": "^5.4.0",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.3"
