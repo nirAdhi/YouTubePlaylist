@@ -53,8 +53,8 @@ export default function AddNoteModal({ onClose, onSave, note }) {
     try {
       const token = localStorage.getItem('token');
       const url = note
-        ? `${process.env.NEXT_PUBLIC_API_URL}/api/notes/${note.id}`
-        : `${process.env.NEXT_PUBLIC_API_URL}/api/notes`;
+        ? `/api/notes/${note.id}`
+        : '/api/notes';
       const method = note ? 'PATCH' : 'POST';
 
       const res = await fetch(url, {
@@ -66,12 +66,17 @@ export default function AddNoteModal({ onClose, onSave, note }) {
         body: JSON.stringify({ title, content, color, category }),
       });
 
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.error || 'Failed to save note');
+      }
+
       const data = await res.json();
       onSave(data);
       onClose();
     } catch (error) {
       console.error('Failed to save note:', error);
-      alert('Failed to save note');
+      alert(error.message || 'Failed to save note');
     } finally {
       setSaving(false);
     }

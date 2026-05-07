@@ -27,7 +27,7 @@ function NotesContent() {
   const fetchNotes = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notes`, {
+      const res = await fetch('/api/notes', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await res.json();
@@ -53,7 +53,7 @@ function NotesContent() {
 
     try {
       const token = localStorage.getItem('token');
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notes/${id}`, {
+      await fetch(`/api/notes/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -66,7 +66,7 @@ function NotesContent() {
   const handleTogglePin = async (note) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notes/${note.id}/pin`, {
+      const res = await fetch(`/api/notes/${note.id}/pin`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` },
       });
