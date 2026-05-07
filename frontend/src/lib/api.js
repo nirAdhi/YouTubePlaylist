@@ -1,9 +1,15 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+function normalizeApiBase(raw) {
+  if (!raw) return '';
+  // Allow configuring either https://example.com or https://example.com/api
+  return raw.replace(/\/+$/, '').replace(/\/api$/, '');
+}
+
+const API_BASE = normalizeApiBase(process.env.NEXT_PUBLIC_API_URL);
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: API_BASE ? `${API_BASE}/api` : '/api',
 });
 
 api.interceptors.request.use((config) => {

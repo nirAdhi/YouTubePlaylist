@@ -73,6 +73,9 @@ const allowedOrigins = [
   'http://127.0.0.1:3003',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
+  // Nginx Proxy Manager may call backend directly from localhost
+  'http://127.0.0.1:5005',
+  'http://localhost:5005',
 ];
 
 app.use(cors((req, callback) => {
