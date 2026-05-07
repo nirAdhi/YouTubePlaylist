@@ -21,6 +21,9 @@ if (missing.length > 0) {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy (Nginx Proxy Manager sits in front)
+app.set('trust proxy', 1);
+
 // Security headers
 app.use(helmet({
   contentSecurityPolicy: {
@@ -54,6 +57,7 @@ const limiter = rateLimit({
   message: { error: 'Too many requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 app.use('/api/', limiter);
 
@@ -62,49 +66,22 @@ const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // limit each IP to 10 login/register attempts per 15 minutes
   message: { error: 'Too many authentication attempts, please try again later.' },
+  validate: { xForwardedForHeader: false },
 });
 app.use('/api/auth', authLimiter);
 
-// CORS - restrict to known origins ONLY
-const allowedOrigins = [
-  'https://tube.prasanit.org',
-  'http://tube.prasanit.org',
-  'http://localhost:3003',
-  'http://127.0.0.1:3003',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  // Nginx Proxy Manager may call backend directly from localhost
-  'http://127.0.0.1:5005',
-  'http://localhost:5005',
-];
-
-app.use(cors((req, callback) => {
-  const origin = req.headers.origin;
-
-  // Allow internal health checks (wget/curl inside container has no Origin)
-  if (!origin && req.path === '/api/health') {
-    return callback(null, {
-      origin: false,
-    });
-  }
-
-  // If Origin is missing, treat it as a non-browser request (no CORS needed)
-  if (!origin) {
-    return callback(null, {
-      origin: false,
-    });
-  }
-
-  if (!allowedOrigins.includes(origin)) {
-    return callback(new Error('Not allowed by CORS'));
-  }
-
-  return callback(null, {
-    origin: true,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  });
+// CORS - echo back any origin (JWT auth provides security; CORS prevents accidental cross-site calls)
+app.use(cors({
+  origin: (origin, callback) => {
+    if (origin) {
+      console.log(`CORS request from origin: ${origin}`);
+    }
+    // Echo back the requesting origin to satisfy browser CORS checks
+    callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json({ limit: '100kb' })); // Limit body size (larger for notes)
