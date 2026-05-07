@@ -7,6 +7,7 @@ import AddVideoModal from '@/components/AddVideoModal';
 import BulkAddModal from '@/components/BulkAddModal';
 import PlaylistSidebar from '@/components/PlaylistSidebar';
 import ReminderModal from '@/components/ReminderModal';
+import ThemeToggle from '@/components/ThemeToggle';
 import { fetchVideos, fetchPlaylists } from '@/lib/api';
 
 const categories = [
@@ -220,6 +221,7 @@ function Dashboard() {
             >
               <span className="text-xl">📝</span>
             </button>
+            <ThemeToggle />
             <button
               onClick={logout}
               className="p-2 rounded-lg hover:bg-gray-800 active:bg-gray-700 text-sm text-gray-400 hover:text-white transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"

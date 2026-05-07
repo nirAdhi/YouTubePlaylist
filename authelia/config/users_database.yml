@@ -1,0 +1,13 @@
+# Authelia user database (file backend)
+# Use: docker run authelia/authelia:latest authelia hash-password 'yourpassword'
+# to generate hashes for new users
+
+users:
+  admin:
+    displayname: "Administrator"
+    password: "$argon2id$v=19$m=65536,t=3,p=4$bXJ..."
+    email: admin@prasanit.org
+    groups:
+      - admins
+      - users
+  # Add more users here

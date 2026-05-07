@@ -88,8 +88,11 @@ app.use(cors((req, callback) => {
     });
   }
 
+  // If Origin is missing, treat it as a non-browser request (no CORS needed)
   if (!origin) {
-    return callback(new Error('Not allowed by CORS'));
+    return callback(null, {
+      origin: false,
+    });
   }
 
   if (!allowedOrigins.includes(origin)) {

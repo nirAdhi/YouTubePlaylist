@@ -86,3 +86,29 @@ export async function deleteReminder(id) {
   const res = await api.delete(`/reminders/${id}`);
   return res.data;
 }
+
+// Notes
+export async function fetchNotes() {
+  const res = await api.get('/notes');
+  return res.data;
+}
+
+export async function createNote(data) {
+  const res = await api.post('/notes', data);
+  return res.data;
+}
+
+export async function updateNote(id, data) {
+  const res = await api.patch(`/notes/${id}`, data);
+  return res.data;
+}
+
+export async function deleteNote(id) {
+  const res = await api.delete(`/notes/${id}`);
+  return res.data;
+}
+
+export async function togglePinNote(id) {
+  const res = await api.patch(`/notes/${id}/pin`);
+  return res.data;
+}

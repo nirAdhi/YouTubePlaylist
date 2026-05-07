@@ -8,6 +8,7 @@ export default function AddNoteModal({ onClose, onSave, note }) {
   const [color, setColor] = useState('gray');
   const [category, setCategory] = useState('General');
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   const colors = [
     { name: 'gray', label: 'Gray' },
@@ -44,39 +45,19 @@ export default function AddNoteModal({ onClose, onSave, note }) {
 
   const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) {
-      alert('Title and content are required');
+      setError('Title and content are required');
       return;
     }
 
     setSaving(true);
+    setError(null);
 
     try {
-      const token = localStorage.getItem('token');
-      const url = note
-        ? `/api/notes/${note.id}`
-        : '/api/notes';
-      const method = note ? 'PATCH' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title, content, color, category }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData?.error || 'Failed to save note');
-      }
-
-      const data = await res.json();
-      onSave(data);
-      onClose();
-    } catch (error) {
-      console.error('Failed to save note:', error);
-      alert(error.message || 'Failed to save note');
+      const data = { title, content, color, category };
+      await onSave(data);
+    } catch (err) {
+      console.error('Failed to save note:', err);
+      setError(err?.response?.data?.error || err?.message || 'Failed to save note. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -96,6 +77,12 @@ export default function AddNoteModal({ onClose, onSave, note }) {
             ×
           </button>
         </div>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
+            {error}
+          </div>
+        )}
 
         <div className="space-y-4">
           <div>

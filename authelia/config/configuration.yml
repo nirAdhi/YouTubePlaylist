@@ -1,0 +1,141 @@
+theme: dark
+jwt_secret: ${JWT_SECRET}
+default_redirection_url: https://tube.prasanit.org
+
+server:
+  address: 'tcp://:9091'
+  disable_healthcheck: false
+
+log:
+  level: info
+  format: text
+  file_path: /config/authelia.log
+  keep_stdout: true
+
+telemetry:
+  metrics:
+    enabled: false
+
+totp:
+  issuer: VidVault
+  period: 30
+  skew: 1
+
+webauthn:
+  disable: false
+  display_name: VidVault
+  attestation_conveyance_preference: indirect
+  user_verification: preferred
+  timeout: 60
+
+authentication_backend:
+  password_reset:
+    disable: false
+    custom_url: ''
+  refresh_interval: 5m
+  ldap:
+    implementation: custom
+    url: ldap://authelia-ldap:389
+    timeout: 5s
+    start_tls: false
+    tls:
+      skip_verify: false
+      minimum_version: TLS1.2
+    base_dn: dc=prasanit,dc=org
+    additional_users_dn: ou=users
+    users_filter: (&({username_attribute}={input})(objectClass=person))
+    additional_groups_dn: ou=groups
+    groups_filter: (member={dn})
+    group_name_attribute: cn
+    mail_attribute: mail
+    display_name_attribute: displayName
+    user: cn=admin,dc=prasanit,dc=org
+    password: ${AUTHELIA_LDAP_PASSWORD}
+
+  # Use file backend for simple deployment (no LDAP needed)
+  file:
+    path: /config/users_database.yml
+    password:
+      algorithm: argon2id
+      argon2id:
+        variant: argon2id
+        iterations: 3
+        memory: 65536
+        parallelism: 4
+        key_length: 32
+        salt_length: 16
+
+access_control:
+  default_policy: deny
+  rules:
+    # Public endpoints (no auth required)
+    - domain: tube.prasanit.org
+      policy: bypass
+      resources:
+        - '^/api/health$'
+        - '^/api/auth/(login|register)$'
+    
+    # Protected endpoints require 2FA
+    - domain: tube.prasanit.org
+      policy: two_factor
+
+    # Admin portal (if you add one)
+    - domain: admin.prasanit.org
+      policy: two_factor
+
+session:
+  name: authelia_session
+  secret: ${AUTHELIA_SESSION_SECRET}
+  expiration: 1h
+  inactivity: 5m
+  remember_me_duration: 1M
+  domain: prasanit.org
+  redis:
+    host: redis-authelia
+    port: 6379
+    password: ${REDIS_PASSWORD}
+    database: 1
+    high_availability:
+      sentinel_name: authelia-redis
+      nodes: []
+      route_by_latency: false
+      route_randomly: false
+
+regulation:
+  max_retries: 3
+  find_time: 2m
+  ban_time: 5m
+
+storage:
+  postgres:
+    address: tcp://db:5432
+    database: authelia
+    schema: public
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    ssl:
+      mode: disable
+      root_certificate: ''
+      certificate: ''
+      key: ''
+  encryption_key: ${AUTHELIA_STORAGE_ENCRYPTION_KEY}
+
+notifier:
+  disable_startup_check: false
+  filesystem:
+    filename: /config/notification.txt
+  # For production, use SMTP:
+  # smtp:
+  #   address: submission://smtp.gmail.com:587
+  #   username: ${SMTP_USER}
+  #   password: ${SMTP_PASSWORD}
+  #   sender: VidVault <noreply@prasanit.org>
+  #   subject: '[VidVault] {title}'
+  #   startup_check_address: test@authelia.com
+  #   disable_require_tls: false
+  #   disable_html_emails: false
+  #   tls:
+  #     skip_verify: false
+  #     minimum_version: TLS1.2
+
+default_2fa_method: totp
