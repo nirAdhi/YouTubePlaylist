@@ -131,7 +131,7 @@ function Dashboard() {
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen relative">
+    <div className="flex min-h-screen relative app-bg">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -158,12 +158,12 @@ function Dashboard() {
 
       <div className="flex-1 min-w-0">
         {/* Mobile-optimized header */}
-        <header className="sticky top-0 z-30 bg-gray-950/90 backdrop-blur border-b border-gray-750 px-3 sm:px-6 py-2.5 sm:py-3">
+        <header className="sticky top-0 z-30 app-bg-card backdrop-blur app-border-b px-3 sm:px-6 py-2.5 sm:py-3">
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Hamburger menu for mobile */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-800 active:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="lg:hidden p-2 -ml-2 rounded-lg app-hover active:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center app-text-secondary"
               aria-label="Open menu"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,7 +177,7 @@ function Dashboard() {
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </div>
-              <h1 className="font-bold text-base sm:text-lg hidden sm:block">VidVault</h1>
+              <h1 className="font-bold text-base sm:text-lg hidden sm:block app-text">VidVault</h1>
             </div>
 
             <div className="flex-1 min-w-0">
@@ -186,7 +186,7 @@ function Dashboard() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search..."
-                className="w-full px-3 sm:px-4 py-2 bg-gray-850 border border-gray-750 rounded-full text-sm focus:outline-none focus:border-gray-600"
+                className="w-full px-3 sm:px-4 py-2 app-bg-input app-border rounded-full text-sm focus:outline-none focus:border-blue-500 app-text"
               />
             </div>
 
@@ -194,7 +194,7 @@ function Dashboard() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowBulkModal(true)}
-                className="flex items-center gap-1.5 px-3 py-2 bg-gray-850 hover:bg-gray-750 rounded-full text-sm font-medium transition-colors active:bg-gray-700 min-h-[44px]"
+                className="flex items-center gap-1.5 px-3 py-2 app-bg-card app-hover rounded-full text-sm font-medium transition-colors active:bg-gray-700 min-h-[44px] app-text"
                 title="Add Multiple Videos"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +215,7 @@ function Dashboard() {
 
             <button
               onClick={() => router.push('/notes')}
-              className="p-2 rounded-lg hover:bg-gray-800 active:bg-gray-700 text-sm text-gray-400 hover:text-white transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="p-2 rounded-lg app-hover active:bg-gray-700 text-sm app-text-secondary transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Notes"
               title="Notes"
             >
@@ -224,8 +224,9 @@ function Dashboard() {
             <ThemeToggle />
             <button
               onClick={logout}
-              className="p-2 rounded-lg hover:bg-gray-800 active:bg-gray-700 text-sm text-gray-400 hover:text-white transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="p-2 rounded-lg app-hover active:bg-gray-700 text-sm app-text-secondary transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Logout"
+              title="Logout"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -243,8 +244,8 @@ function Dashboard() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3 sm:px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors flex-shrink-0 min-h-[36px] ${
                   selectedCategory === cat
-                    ? 'bg-white text-gray-950 font-medium'
-                    : 'bg-gray-850 hover:bg-gray-750'
+                    ? 'app-bg-pill-active font-medium'
+                    : 'app-bg-pill app-hover app-text-secondary'
                 }`}
               >
                 {cat}
@@ -254,8 +255,8 @@ function Dashboard() {
 
           {filteredVideos.length === 0 ? (
             <div className="text-center py-16 sm:py-20">
-              <p className="text-gray-400 text-lg">No videos found</p>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="app-text-secondary text-lg">No videos found</p>
+              <p className="app-text-muted text-sm mt-1">
                 Add your first video to get started
               </p>
             </div>
@@ -310,7 +311,7 @@ function Dashboard() {
 export default function Page() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-400">
+      <div className="min-h-screen flex items-center justify-center app-bg app-text-secondary">
         <div className="w-8 h-8 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin" />
       </div>
     }>

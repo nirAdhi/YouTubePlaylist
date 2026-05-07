@@ -64,122 +64,104 @@ export default function AddNoteModal({ onClose, onSave, note }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg app-bg-card rounded-2xl border app-border p-6 sm:p-8 shadow-2xl">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold app-text">
             {note ? 'Edit Note' : 'New Note'}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl"
-          >
-            ×
+          <button onClick={onClose} className="app-text-secondary hover:app-text transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
+          <div className="mb-6 p-4 bg-red-900/20 border border-red-700/50 rounded-lg text-red-400 text-sm">
             {error}
           </div>
         )}
 
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Title
-            </label>
+            <label className="block text-sm font-semibold app-text-secondary mb-2 uppercase tracking-wider">Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Note title..."
-              className="w-full bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 app-bg-input app-border rounded-xl focus:outline-none focus:border-blue-500 app-text text-lg font-medium"
+              placeholder="Give your note a title..."
+              required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Category
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Color
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {colors.map((c) => (
-                <button
-                  key={c.name}
-                  type="button"
-                  onClick={() => setColor(c.name)}
-                  className={`w-10 h-10 rounded-lg border-2 transition-all ${
-                    color === c.name ? 'border-white scale-110' : 'border-transparent'
-                  } bg-${c.name}-600`}
-                  style={{
-                    backgroundColor:
-                      c.name === 'gray' ? '#4b5563' :
-                      c.name === 'red' ? '#dc2626' :
-                      c.name === 'orange' ? '#ea580c' :
-                      c.name === 'yellow' ? '#ca8a04' :
-                      c.name === 'green' ? '#16a34a' :
-                      c.name === 'blue' ? '#2563eb' :
-                      c.name === 'purple' ? '#9333ea' :
-                      c.name === 'pink' ? '#db2777' : '#4b5563'
-                  }}
-                  title={c.label}
-                />
-              ))}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold app-text-secondary mb-2 uppercase tracking-wider">Category</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-4 py-3 app-bg-input app-border rounded-xl focus:outline-none focus:border-blue-500 app-text appearance-none"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold app-text-secondary mb-2 uppercase tracking-wider">Color</label>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {colors.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setColor(c)}
+                    className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
+                      color === c ? 'border-blue-500 scale-110' : 'border-transparent'
+                    } ${c === 'gray' ? 'bg-gray-500' : 
+                         c === 'red' ? 'bg-red-500' :
+                         c === 'orange' ? 'bg-orange-500' :
+                         c === 'yellow' ? 'bg-yellow-500' :
+                         c === 'green' ? 'bg-green-500' :
+                         c === 'blue' ? 'bg-blue-500' :
+                         c === 'purple' ? 'bg-purple-500' : 'bg-pink-500'}`}
+                    title={c.charAt(0).toUpperCase() + c.slice(1)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Content
-            </label>
+            <label className="block text-sm font-semibold app-text-secondary mb-2 uppercase tracking-wider">Content</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Write your note here... 
-
-You can store:
-- Configuration settings
-- Commands & scripts
-- Code snippets
-- Important information
-- Ideas & thoughts"
-              className="w-full h-64 bg-gray-700 text-white rounded-lg px-4 py-3 text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={8}
+              className="w-full px-4 py-4 app-bg-input app-border rounded-xl focus:outline-none focus:border-blue-500 app-text resize-none"
+              placeholder="What's on your mind?"
+              required
             />
           </div>
-        </div>
 
-        <div className="flex gap-3 mt-6">
-          <button
-            onClick={handleSubmit}
-            disabled={saving || !title.trim() || !content.trim()}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-          >
-            {saving ? 'Saving...' : (note ? 'Update Note' : 'Create Note')}
-          </button>
-          <button
-            onClick={onClose}
-            className="px-6 py-3 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
+          <div className="flex gap-4 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-3 app-bg-pill app-hover rounded-xl transition-colors font-medium app-text"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex-[2] py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-600/30 disabled:opacity-50"
+            >
+              {saving ? 'Saving...' : note ? 'Update Note' : 'Create Note'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

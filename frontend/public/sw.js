@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vidvault-v1';
+const CACHE_NAME = 'vidvault-v2';
 const STATIC_ASSETS = ['/', '/login', '/register'];
 
 self.addEventListener('install', (event) => {

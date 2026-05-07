@@ -27,8 +27,8 @@ router.get('/', async (req, res) => {
     });
     res.json(videos);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch videos' });
+    console.error('GET /videos error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to fetch videos', detail: error.message });
   }
 });
 
@@ -75,8 +75,8 @@ router.post('/', async (req, res) => {
 
     res.json(video);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to add video' });
+    console.error('POST /videos error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to add video', detail: error.message });
   }
 });
 
@@ -89,8 +89,8 @@ router.get('/:id', async (req, res) => {
     if (!video) return res.status(404).json({ error: 'Video not found' });
     res.json(video);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch video' });
+    console.error('GET /videos/:id error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to fetch video', detail: error.message });
   }
 });
 
@@ -111,8 +111,8 @@ router.patch('/:id', async (req, res) => {
     const updated = await prisma.video.findUnique({ where: { id: req.params.id } });
     res.json(updated);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to update video' });
+    console.error('PATCH /videos/:id error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to update video', detail: error.message });
   }
 });
 
@@ -123,8 +123,8 @@ router.delete('/:id', async (req, res) => {
     });
     res.json({ success: true });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to delete video' });
+    console.error('DELETE /videos/:id error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to delete video', detail: error.message });
   }
 });
 
@@ -195,8 +195,8 @@ router.post('/bulk', async (req, res) => {
 
     res.json(results);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to process bulk add' });
+    console.error('POST /videos/bulk error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to process bulk add', detail: error.message });
   }
 });
 

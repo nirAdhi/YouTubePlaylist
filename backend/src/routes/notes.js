@@ -19,8 +19,8 @@ router.get('/', async (req, res) => {
     });
     res.json(notes);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch notes' });
+    console.error('GET /notes error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to fetch notes', detail: error.message });
   }
 });
 
@@ -38,8 +38,8 @@ router.get('/:id', async (req, res) => {
     }
     res.json(note);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch note' });
+    console.error('GET /notes/:id error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to fetch note', detail: error.message });
   }
 });
 
@@ -64,8 +64,8 @@ router.post('/', async (req, res) => {
     });
     res.json(note);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to create note' });
+    console.error('POST /notes error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to create note', detail: error.message });
   }
 });
 
@@ -97,8 +97,8 @@ router.patch('/:id', async (req, res) => {
     });
     res.json(note);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to update note' });
+    console.error('PATCH /notes/:id error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to update note', detail: error.message });
   }
 });
 
@@ -121,8 +121,8 @@ router.delete('/:id', async (req, res) => {
     });
     res.json({ success: true });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to delete note' });
+    console.error('DELETE /notes/:id error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to delete note', detail: error.message });
   }
 });
 
@@ -146,8 +146,8 @@ router.patch('/:id/pin', async (req, res) => {
     });
     res.json(note);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to toggle pin' });
+    console.error('PATCH /notes/:id/pin error:', error.stack || error.message);
+    res.status(500).json({ error: 'Failed to toggle pin', detail: error.message });
   }
 });
 

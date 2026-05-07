@@ -98,11 +98,11 @@ app.get('/api/health', (req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error('Error:', err.message);
+  console.error(`Error on ${req.method} ${req.path}:`, err.stack || err.message);
   if (err.message === 'Not allowed by CORS') {
     return res.status(403).json({ error: 'CORS policy violation' });
   }
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(500).json({ error: 'Internal server error', detail: err.message });
 });
 
 const server = app.listen(PORT, '0.0.0.0', () => {

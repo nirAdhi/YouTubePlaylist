@@ -57,3 +57,27 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Theme-aware utility classes */
+.app-bg { background-color: var(--bg-primary); }
+.app-bg-card { background-color: var(--bg-secondary); }
+.app-bg-input { background-color: var(--bg-tertiary); }
+.app-bg-pill { background-color: var(--bg-tertiary); }
+.app-bg-pill-active { background-color: var(--text-primary); color: var(--bg-primary); }
+.app-text { color: var(--text-primary); }
+.app-text-secondary { color: var(--text-secondary); }
+.app-text-muted { color: var(--text-muted); }
+.app-border { border-color: var(--border-color); }
+.app-border-b { border-bottom: 1px solid var(--border-color); }
+.app-border-r { border-right: 1px solid var(--border-color); }
+.app-border-t { border-top: 1px solid var(--border-color); }
+.app-hover:hover { background-color: var(--bg-tertiary); }
+.app-input {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+.app-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
