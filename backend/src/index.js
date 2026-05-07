@@ -72,18 +72,30 @@ const allowedOrigins = [
   'http://127.0.0.1:3003',
 ];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Block requests with no origin (curl, scripts, bots)
-    if (!origin) return callback(new Error('Not allowed by CORS'));
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+app.use(cors((req, callback) => {
+  const origin = req.headers.origin;
+
+  // Allow internal health checks (wget/curl inside container has no Origin)
+  if (!origin && req.path === '/api/health') {
+    return callback(null, {
+      origin: false,
+    });
+  }
+
+  if (!origin) {
     return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  }
+
+  if (!allowedOrigins.includes(origin)) {
+    return callback(new Error('Not allowed by CORS'));
+  }
+
+  return callback(null, {
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 }));
 
 app.use(express.json({ limit: '100kb' })); // Limit body size (larger for notes)
