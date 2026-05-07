@@ -43,7 +43,8 @@ export default function AddNoteModal({ onClose, onSave, note }) {
     }
   }, [note]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
     if (!title.trim() || !content.trim()) {
       setError('Title and content are required');
       return;
@@ -116,17 +117,17 @@ export default function AddNoteModal({ onClose, onSave, note }) {
                   <button
                     key={c}
                     type="button"
-                    onClick={() => setColor(c)}
+                    onClick={() => setColor(c.name)}
                     className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
-                      color === c ? 'border-blue-500 scale-110' : 'border-transparent'
-                    } ${c === 'gray' ? 'bg-gray-500' : 
-                         c === 'red' ? 'bg-red-500' :
-                         c === 'orange' ? 'bg-orange-500' :
-                         c === 'yellow' ? 'bg-yellow-500' :
-                         c === 'green' ? 'bg-green-500' :
-                         c === 'blue' ? 'bg-blue-500' :
-                         c === 'purple' ? 'bg-purple-500' : 'bg-pink-500'}`}
-                    title={c.charAt(0).toUpperCase() + c.slice(1)}
+                      color === c.name ? 'border-blue-500 scale-110' : 'border-transparent'
+                    } ${c.name === 'gray' ? 'bg-gray-500' : 
+                         c.name === 'red' ? 'bg-red-500' :
+                         c.name === 'orange' ? 'bg-orange-500' :
+                         c.name === 'yellow' ? 'bg-yellow-500' :
+                         c.name === 'green' ? 'bg-green-500' :
+                         c.name === 'blue' ? 'bg-blue-500' :
+                         c.name === 'purple' ? 'bg-purple-500' : 'bg-pink-500'}`}
+                    title={c.label}
                   />
                 ))}
               </div>
