@@ -30,10 +30,11 @@ function SharePageContent() {
   }, [router, searchParams]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-400">
+    <div className="min-h-screen flex items-center justify-center app-bg app-text-secondary">
       <div className="text-center">
         <div className="w-12 h-12 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
-        <p>Processing shared link...</p>
+        <p className="font-medium">Processing shared link...</p>
+        <p className="text-sm app-text-muted mt-2">Opening VidVault...</p>
       </div>
     </div>
   );
@@ -42,9 +43,12 @@ function SharePageContent() {
 export default function SharePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-400">
-        <div className="w-12 h-12 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
-        <p>Processing shared link...</p>
+      <div className="min-h-screen flex items-center justify-center app-bg app-text-secondary">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
+          <p className="font-medium">Processing shared link...</p>
+          <p className="text-sm app-text-muted mt-2">Opening VidVault...</p>
+        </div>
       </div>
     }>
       <SharePageContent />
