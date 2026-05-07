@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import NoteCard from '../../components/NoteCard';
 import AddNoteModal from '../../components/AddNoteModal';
+import NoteViewModal from '../../components/NoteViewModal';
 import ThemeToggle from '@/components/ThemeToggle';
 import { fetchNotes, createNote, updateNote, deleteNote, togglePinNote } from '@/lib/api';
 
@@ -14,6 +15,7 @@ function NotesContent() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [viewingNote, setViewingNote] = useState(null);
   const [editingNote, setEditingNote] = useState(null);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -194,6 +196,7 @@ function NotesContent() {
                       onEdit={handleEdit}
                       onDelete={handleDelete}
                       onTogglePin={handleTogglePin}
+                      onClick={() => setViewingNote(note)}
                     />
                   ))}
                 </div>
@@ -213,6 +216,7 @@ function NotesContent() {
                       onEdit={handleEdit}
                       onDelete={handleDelete}
                       onTogglePin={handleTogglePin}
+                      onClick={() => setViewingNote(note)}
                     />
                   ))}
                 </div>
@@ -230,6 +234,16 @@ function NotesContent() {
           }}
           onSave={handleSave}
           note={editingNote}
+        />
+      )}
+
+      {viewingNote && (
+        <NoteViewModal
+          note={viewingNote}
+          onClose={() => setViewingNote(null)}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onTogglePin={handleTogglePin}
         />
       )}
     </div>

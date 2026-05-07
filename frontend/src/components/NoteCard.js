@@ -1,6 +1,6 @@
 'use client';
 
-export default function NoteCard({ note, onEdit, onDelete, onTogglePin }) {
+export default function NoteCard({ note, onEdit, onDelete, onTogglePin, onClick }) {
   const colorMap = {
     gray: 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700',
     red: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
@@ -15,7 +15,10 @@ export default function NoteCard({ note, onEdit, onDelete, onTogglePin }) {
   const colorStyle = colorMap[note.color] || colorMap.gray;
 
   return (
-    <div className={`relative rounded-xl border p-5 transition-all hover:shadow-xl group ${colorStyle}`}>
+    <div 
+      className={`relative rounded-xl border p-5 transition-all hover:shadow-xl group cursor-pointer active:scale-[0.98] ${colorStyle}`}
+      onClick={onClick}
+    >
       {note.isPinned && (
         <div className="absolute -top-2 -right-2 bg-yellow-500 rounded-full w-8 h-8 flex items-center justify-center shadow-lg transform rotate-12 group-hover:rotate-0 transition-transform">
           <span className="text-white text-sm">📌</span>
@@ -42,7 +45,10 @@ export default function NoteCard({ note, onEdit, onDelete, onTogglePin }) {
 
       <div className="flex gap-2 pt-4 border-t border-black/5 dark:border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
-          onClick={() => onTogglePin(note)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onTogglePin(note);
+          }}
           className={`flex-1 text-xs py-2 rounded-lg font-medium transition-colors ${
             note.isPinned
               ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30'
@@ -52,13 +58,19 @@ export default function NoteCard({ note, onEdit, onDelete, onTogglePin }) {
           {note.isPinned ? 'Unpin' : 'Pin'}
         </button>
         <button
-          onClick={() => onEdit(note)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(note);
+          }}
           className="flex-1 text-xs py-2 bg-blue-600/10 text-blue-600 dark:text-blue-400 hover:bg-blue-600/20 rounded-lg font-medium transition-colors"
         >
           Edit
         </button>
         <button
-          onClick={() => onDelete(note.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(note.id);
+          }}
           className="flex-1 text-xs py-2 bg-red-600/10 text-red-600 dark:text-red-400 hover:bg-red-600/20 rounded-lg font-medium transition-colors"
         >
           Delete
