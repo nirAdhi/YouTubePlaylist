@@ -87,6 +87,12 @@ export async function deleteReminder(id) {
   return res.data;
 }
 
+// Bulk videos
+export async function bulkAddVideos(urls) {
+  const res = await api.post('/videos/bulk', { urls });
+  return res.data;
+}
+
 // Notes
 export async function fetchNotes() {
   const res = await api.get('/notes');

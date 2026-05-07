@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { bulkAddVideos } from '@/lib/api';
 
 export default function BulkAddModal({ onClose, onBulkAdd }) {
   const [urlsText, setUrlsText] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
+  const [error, setError] = useState('');
 
   const handleSubmit = async () => {
     const urls = urlsText
@@ -14,33 +16,24 @@ export default function BulkAddModal({ onClose, onBulkAdd }) {
       .filter(u => u.length > 0);
 
     if (urls.length === 0) {
-      alert('Please enter at least one URL');
+      setError('Please enter at least one URL');
       return;
     }
 
     setLoading(true);
     setResults(null);
+    setError('');
 
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos/bulk`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ urls }),
-      });
-
-      const data = await res.json();
+      const data = await bulkAddVideos(urls);
       setResults(data);
 
       if (data.added?.length > 0) {
         onBulkAdd(data.added);
       }
-    } catch (error) {
-      console.error('Bulk add failed:', error);
-      alert('Failed to process videos');
+    } catch (err) {
+      console.error('Bulk add failed:', err);
+      setError(err?.response?.data?.error || err?.message || 'Failed to process videos');
     } finally {
       setLoading(false);
     }
@@ -58,6 +51,12 @@ export default function BulkAddModal({ onClose, onBulkAdd }) {
             ×
           </button>
         </div>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
+            {error}
+          </div>
+        )}
 
         <p className="text-gray-400 text-sm mb-4">
           Paste multiple video URLs (one per line). Supports YouTube, TikTok, Instagram, Facebook, Twitter, Vimeo, Reddit, and more.
