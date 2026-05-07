@@ -7,8 +7,7 @@ services:
     ports:
       - "127.0.0.1:3000:3000"
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     networks:
@@ -20,12 +19,6 @@ services:
     tmpfs:
       - /tmp
       - /app/.next/cache
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
 
   backend:
     build: ./backend
@@ -39,21 +32,13 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - NODE_ENV=production
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - db
+      - redis
     networks:
       - vidvault-internal
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/videos"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   worker:
     build: ./backend
@@ -64,10 +49,8 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - NODE_ENV=production
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - db
+      - redis
     networks:
       - vidvault-internal
     restart: unless-stopped
@@ -90,11 +73,6 @@ services:
       - vidvault-internal
     security_opt:
       - no-new-privileges:true
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -112,11 +90,6 @@ services:
       - vidvault-internal
     security_opt:
       - no-new-privileges:true
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
 networks:
   vidvault-internal:
