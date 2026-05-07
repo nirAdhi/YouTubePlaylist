@@ -81,7 +81,13 @@ services:
     expose:
       - "6379"
     command: >
-      sh -c "redis-server --appendonly yes --requirepass \"$${REDIS_PASSWORD}\""
+      sh -c '
+        if [ -z "$${REDIS_PASSWORD}" ]; then
+          echo "FATAL: REDIS_PASSWORD not set" >&2;
+          exit 1;
+        fi;
+        redis-server --appendonly yes --requirepass "$${REDIS_PASSWORD}"
+      '
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:

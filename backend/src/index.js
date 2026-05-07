@@ -10,6 +10,14 @@ const playlistRoutes = require('./routes/playlists');
 const reminderRoutes = require('./routes/reminders');
 const noteRoutes = require('./routes/notes');
 
+// Validate critical environment variables at startup
+const requiredEnvVars = ['DATABASE_URL', 'REDIS_URL', 'JWT_SECRET'];
+const missing = requiredEnvVars.filter((v) => !process.env[v]);
+if (missing.length > 0) {
+  console.error(`FATAL: Missing required environment variables: ${missing.join(', ')}`);
+  process.exit(1);
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -29,6 +37,14 @@ app.use(helmet({
     },
   },
   crossOriginEmbedderPolicy: false,
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+  frameguard: { action: 'sameorigin' },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  permittedCrossDomainPolicies: false,
 }));
 
 // Rate limiting
@@ -49,7 +65,7 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth', authLimiter);
 
-// CORS - restrict to known origins
+// CORS - restrict to known origins ONLY
 const allowedOrigins = [
   'https://tube.prasanit.org',
   'http://localhost:3000',
@@ -58,8 +74,8 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, etc.)
-    if (!origin) return callback(null, true);
+    // Block requests with no origin (curl, scripts, bots)
+    if (!origin) return callback(new Error('Not allowed by CORS'));
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
