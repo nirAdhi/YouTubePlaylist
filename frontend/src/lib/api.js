@@ -9,7 +9,7 @@ function normalizeApiBase(raw) {
 const API_BASE = normalizeApiBase(process.env.NEXT_PUBLIC_API_URL);
 
 const api = axios.create({
-  baseURL: API_BASE ? `${API_BASE}/api` : '/api',
+  baseURL: '/api',
 });
 
 api.interceptors.request.use((config) => {
